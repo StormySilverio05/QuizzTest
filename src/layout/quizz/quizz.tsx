@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Questions } from "../../data/questions";
 import { useState, useEffect } from "react";
+import { StartModal } from "../../components/modals/StartModal";
+import { ResultsModal } from "../../components/modals/ResultsModal";
 export const QuizScreen = () => {
   //States
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -30,6 +32,19 @@ export const QuizScreen = () => {
   };
 
   useEffect(() => {
+    const data = localStorage.getItem("dataGame");
+    if (data) {
+      const parsed = JSON.parse(data);
+      setPoint(parsed.point);
+      setTime(parsed.time);
+      setShowModal(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if(showModal){
+      setShowStartModal(false);
+    }
     if (!showStartModal) return;
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -43,17 +58,7 @@ export const QuizScreen = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showStartModal]);
-
-  useEffect(() => {
-    const data = localStorage.getItem("dataGame");
-    if (data) {
-      const parsed = JSON.parse(data);
-      setPoint(parsed.point);
-      setTime(parsed.time);
-      setShowModal(true);
-    }
-  }, []);
+  }, [showStartModal, showModal]);
 
   useEffect(() => {
     if (showStartModal){
@@ -189,110 +194,10 @@ export const QuizScreen = () => {
           </div>
         </div>
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0B1120] p-8 shadow-2xl">
-              {/* Header */}
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-4xl">
-                  🏆
-                </div>
-
-                <h2 className="text-3xl font-black text-white">
-                  Quiz Finished
-                </h2>
-
-                <p className="mt-2 text-slate-400">
-                  Here are your final results
-                </p>
-              </div>
-
-              {/* Stats */}
-              <div className="mt-8 space-y-4">
-                <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div>
-                    <p className="text-sm text-slate-400">Final Score</p>
-
-                    <h3 className="text-2xl font-black text-cyan-400">
-                      {point} pts
-                    </h3>
-                  </div>
-
-                  <div className="text-4xl">🎯</div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div>
-                    <p className="text-sm text-slate-400">Remaining Time</p>
-
-                    <h3 className="text-2xl font-black text-red-400">
-                      {time}s
-                    </h3>
-                  </div>
-
-                  <div className="text-4xl">⏱️</div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div>
-                    <p className="text-sm text-slate-400">Correct Answers</p>
-
-                    <h3 className="text-2xl font-black text-green-400">
-                      {point / 10} / {Questions.length}
-                    </h3>
-                  </div>
-
-                  <div className="text-4xl">✅</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ResultsModal point={point} time={time}/>
         )}
         {showStartModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
-            <div className="w-full max-w-lg rounded-3xl border border-cyan-400/20 bg-[#0B1120] p-10 shadow-[0_0_40px_rgba(34,211,238,0.15)]">
-              {/* Header */}
-              <div className="text-center">
-                <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-5xl shadow-[0_0_30px_rgba(34,211,238,0.4)]">
-                  🚀
-                </div>
-
-                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-                  Get Ready
-                </p>
-
-                <h1 className="mt-3 text-4xl font-black text-white">
-                  Science Challenge
-                </h1>
-
-                <p className="mt-4 text-slate-400">
-                  The quiz is about to begin. Prepare yourself and focus.
-                </p>
-              </div>
-
-              {/* Countdown */}
-              <div className="mt-10 flex justify-center">
-                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-cyan-400 bg-cyan-400/10 text-6xl font-black text-cyan-300 shadow-[0_0_30px_rgba(34,211,238,0.25)]">
-                  {countdown}
-                </div>
-              </div>
-
-              {/* Bottom */}
-              <div className="mt-10">
-                <div className="h-3 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    style={{
-                      width: `${((5 - countdown) / 5) * 100}%`,
-                    }}
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-1000"
-                  />
-                </div>
-
-                <p className="mt-4 text-center text-sm text-slate-500">
-                  Quiz starts automatically...
-                </p>
-              </div>
-            </div>
-          </div>
+          <StartModal countdown={countdown}/>
         )}
       </section>
     </main>
