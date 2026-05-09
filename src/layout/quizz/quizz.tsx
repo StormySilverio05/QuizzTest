@@ -9,6 +9,7 @@ export const QuizScreen = () => {
     text: string;
     isCorrect: boolean;
   } | null>(null);
+  
   const [point, setPoint] = useState(0);
   const [time, setTime] = useState(60);
   const [showModal, setShowModal] = useState(false);
